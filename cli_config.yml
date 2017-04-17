@@ -1,0 +1,62 @@
+---
+entry:
+  name: cloud-cli
+interfaces:
+  name: clouds
+  help: "Cloud Options"
+  options:
+  - aws
+  - openstack
+arguments:
+- name: instance
+  type: positional
+  help: "Instance Arguments"
+  options:
+  - create
+  - delete
+  - update
+  - stop
+  - start
+  - list
+  - detail
+- name: network
+  type: positional
+  help: "Network Arguments"
+  options:
+  - create
+  - delete
+  - update
+  - list
+  - detail
+- name: stack
+  type: positional
+  help: "Stack Arguments"
+  options:
+  - create
+  - delete
+  - update
+  - list
+  - detail
+- name: storage
+  type: positional
+  help: "Storage Arguments"
+  options:
+  - create
+  - delete
+  - update
+  - list
+  - detail
+  - createfile
+  - updatefile
+  - deletefile
+- name: volume
+  type: positional
+  help: "Volume Arguments"
+  options:
+  - create
+  - delete
+  - update
+  - list
+  - detail
+  - attach
+  - detach
