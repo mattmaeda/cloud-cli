@@ -1,25 +1,19 @@
 #!/usr/bin/python
+"""
+cloud-cli
 
-################################################################################
-#
-# cloud-cli
-#
-# Main entry point for managing and controlling/configuring resources in a cloud
-# platform
-#
-################################################################################
-
-from cli import CLI
+Main entry point for managing and controlling/configuring resources in a cloud
+platform
+"""
 import os
-
+from cli import CLI
 
 MY_PATH = os.path.abspath(os.path.dirname(__file__))
 DEFAULT_CFG = os.path.join(MY_PATH, "cli_config.yml")
 
-
 def main():
+    """ Runs the cli """
     cli = CLI(DEFAULT_CFG)
-    cli.init()
     cli.run()
 
 
