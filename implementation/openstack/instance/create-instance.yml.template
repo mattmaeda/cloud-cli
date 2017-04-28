@@ -1,0 +1,24 @@
+---
+name: server_name
+image: image_name
+flavor: server_size
+meta:
+files:
+reservation_id:
+min_count: 1
+max_count:
+security_groups:
+- example_sec_group_1
+- example_sec_group_2
+userdata:
+key_name: example-pair.pem
+availability_zone: example-az
+block_device_mapping:
+block_device_mapping_v2:
+nics:
+scheduler_hints:
+config_drive:
+disk_config:
+admin_pass:
+access_ip_v4:
+access_ip_v6:

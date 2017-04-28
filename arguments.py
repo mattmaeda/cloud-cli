@@ -40,6 +40,9 @@ class CLIArgument(object):
             and loads the implementation to the CLI parser
         """
         for namespace_option in self.implementation_options:
+            if namespace_option not in self.required_cli_arguments:
+                self.required_cli_arguments[namespace_option] = []
+
             self.setup_implementation(namespace_option)
 
 
@@ -52,7 +55,9 @@ class CLIArgument(object):
                                               self.cli_argument_namespace,
                                               self.cli_argument_name)
 
-        if not os.path.exists(namespace_command_path):
+        namespace_python_module = "{}.py".format(namespace_command_path)
+
+        if not os.path.exists(namespace_python_module):
             msg = "Missing command {} on namespace {} for " \
                   "implementation {} at {}".format(self.cli_argument_name,
                                                    self.cli_argument_namespace,
@@ -63,7 +68,7 @@ class CLIArgument(object):
 
         else:
             self.load_command_implementation(namespace_option,
-                                             namespace_command_path)
+                                             namespace_python_module)
 
 
     def command_not_implemented(self, user_entered_cli_args):
@@ -72,11 +77,11 @@ class CLIArgument(object):
 
 
     def load_command_implementation(self, namespace_option,
-                                    namespace_command_path):
+                                    namespace_python_module):
         """ Loads the implementation of the command for the given
             namespace and its corresponding function call
         """
-        module = imp.load_source('implementation', namespace_command_path)
+        module = imp.load_source('implementation', namespace_python_module)
         self.load_implementation_arguments(namespace_option,
                                            getattr(module, "ARGS"))
         self.cli_functions[namespace_option] = getattr(module, "execute")
@@ -98,10 +103,6 @@ class CLIArgument(object):
 
             if required:
                 req_arg = {"name": arg_name, "help": help_text}
-
-                if namespace_option not in self.required_cli_arguments:
-                    self.required_cli_arguments[namespace_option] = []
-
                 self.required_cli_arguments[namespace_option].append(req_arg)
 
 

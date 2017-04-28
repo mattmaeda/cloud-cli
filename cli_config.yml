@@ -19,6 +19,12 @@ arguments:
   - start
   - list
   - detail
+- name: image
+  type: positional
+  help: "Image Arguments"
+  options:
+  - create
+  - delete
 - name: network
   type: positional
   help: "Network Arguments"

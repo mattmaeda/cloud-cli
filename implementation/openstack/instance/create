@@ -1,0 +1,9 @@
+#!/usr/bin/python
+
+ARGS = [
+    {'name': 'access', 'required': True, 'help': 'Openstack access key'},
+    {'name': 'dummy', 'help': 'Openstack secret key'}
+]
+
+def execute(args):
+    print "OPENSTACK CREATE"
