@@ -1,8 +1,10 @@
 """
-Creates an image from a given server
+Connects to Openstack environment and stops an instance
 """
 import logging.config
 import os
+import novaclient
+import re
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -14,6 +16,7 @@ OPENSTACK_DIR = os.path.abspath(os.path.join(MY_PATH, os.pardir))
 IMPLEMENTATION_DIR = os.path.abspath(os.path.join(OPENSTACK_DIR, os.pardir))
 CLI_BASE_PATH = os.path.abspath(os.path.join(IMPLEMENTATION_DIR, os.pardir))
 
+ALREADY_STOPPED_PATTERN = "Cannot 'stop' instance .* while it is in vm_state stopped"
 logging.config.fileConfig(os.path.join(CLI_BASE_PATH, 'logging.conf'))
 
 ARGS = [
@@ -24,13 +27,12 @@ ARGS = [
     {
         'name': 'instance_name',
         'required': True,
-        'help': 'Name of instance from which to make an instance'
-    },
-    {'name': 'image_name', 'required': True, 'help': 'Name of image'}
+        'help': 'Name of instance to stop'
+    }
 ]
 
 def execute(args):
-    """ Creates image """
+    """ Stops a running instance """
     openstack = OpenstackClient(auth_url=args.auth_url,
                                 username=args.username,
                                 password=args.password,
@@ -44,7 +46,12 @@ def execute(args):
         sys.exit(1)
 
     else:
-        instance.create_image(args.image_name)
-
-
-        
+        try:
+            instance.stop()
+        except novaclient.exceptions.Conflict, conflict_exception:
+            pattern = re.compile(ALREADY_STOPPED_PATTERN)
+            if pattern.match(conflict_exception.message):
+                logging.warning("Instance '{}' " \
+                                "already stopped".format(args.instance_name))
+            else:
+                raise conflict_exception

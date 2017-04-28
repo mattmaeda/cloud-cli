@@ -1,5 +1,5 @@
 """
-Creates an image from a given server
+Connects to Openstack environment and stops an instance
 """
 import logging.config
 import os
@@ -7,7 +7,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from client import OpenstackClient
-from util import get_instance
+from util import get_all_instances
 
 MY_PATH = os.path.abspath(os.path.dirname(__file__))
 OPENSTACK_DIR = os.path.abspath(os.path.join(MY_PATH, os.pardir))
@@ -24,27 +24,26 @@ ARGS = [
     {
         'name': 'instance_name',
         'required': True,
-        'help': 'Name of instance from which to make an instance'
-    },
-    {'name': 'image_name', 'required': True, 'help': 'Name of image'}
+        'help': 'Name of instance to delete'
+    }
 ]
 
 def execute(args):
-    """ Creates image """
+    """ Deletes an instance """
     openstack = OpenstackClient(auth_url=args.auth_url,
                                 username=args.username,
                                 password=args.password,
                                 project_id=args.project_id)
 
-    instance = get_instance(openstack, args.instance_name)
+    instances = get_all_instances(openstack, args.instance_name)
 
-    if instance is None:
-        logging.error("Unable to load instance " \
+    if instances is None:
+        logging.warning("Unable to find instance " \
                       "'{}'".format(args.instance_name))
-        sys.exit(1)
-
+    elif len(instances) > 1:
+        logging.error("Found {} instances " \
+                      "of instance '{}'".format(len(instances),
+                                                args.instance_name))
     else:
-        instance.create_image(args.image_name)
-
-
-        
+        instance = instances[0]
+        instance.delete()

@@ -23,6 +23,7 @@ def execute(args):
                                 username=args.username,
                                 password=args.password,
                                 project_id=args.project_id)
-    
+
     image = openstack.connection.images.find(name=args.image_name)
     image.delete()
+    

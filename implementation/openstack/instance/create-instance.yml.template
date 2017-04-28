@@ -1,21 +1,22 @@
 ---
-name: server_name
-image: image_name
-flavor: server_size
+name: server_name (required)
+image: image_name (required)
+flavor: server_size (required)
 meta:
 files:
 reservation_id:
 min_count: 1
 max_count:
 security_groups:
-- example_sec_group_1
+- example_sec_group_1 (at least one required)
 - example_sec_group_2
 userdata:
-key_name: example-pair.pem
-availability_zone: example-az
+key_name: name-of-pem (required)
+availability_zone: example-az (required)
 block_device_mapping:
 block_device_mapping_v2:
 nics:
+- example_network (at least one required)
 scheduler_hints:
 config_drive:
 disk_config:
