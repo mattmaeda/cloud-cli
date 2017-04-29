@@ -1,9 +1,11 @@
 """
-Creates an image from a given server
+Connects to Openstack environment and starts an instance
 """
 import logging.config
 import os
+import re
 import sys
+import novaclient
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from client import OpenstackClient
@@ -14,6 +16,7 @@ OPENSTACK_DIR = os.path.abspath(os.path.join(MY_PATH, os.pardir))
 IMPLEMENTATION_DIR = os.path.abspath(os.path.join(OPENSTACK_DIR, os.pardir))
 CLI_BASE_PATH = os.path.abspath(os.path.join(IMPLEMENTATION_DIR, os.pardir))
 
+ALREADY_STARTED_PATTERN = "Cannot 'start' instance .* while it is in vm_state active"
 logging.config.fileConfig(os.path.join(CLI_BASE_PATH, 'logging.conf'))
 
 ARGS = [
@@ -24,13 +27,12 @@ ARGS = [
     {
         'name': 'instance_name',
         'required': True,
-        'help': 'Name of instance from which to make an instance'
-    },
-    {'name': 'image_name', 'required': True, 'help': 'Name of image'}
+        'help': 'Name of instance to start'
+    }
 ]
 
 def execute(args):
-    """ Creates image """
+    """ Starts a stopped instance """
     openstack = OpenstackClient(auth_url=args.auth_url,
                                 username=args.username,
                                 password=args.password,
@@ -44,6 +46,21 @@ def execute(args):
         sys.exit(1)
 
     else:
-        instance.create_image(args.image_name)
+        start(instance, args.instance_name)
 
 
+def start(instance, instance_name):
+    """ Given a valid instance, attempts to start the instance
+    """
+    try:
+        instance.start()
+        logging.info("Instance '{}' started".format(instance_name))
+
+    except novaclient.exceptions.Conflict, conflict_exception:
+        pattern = re.compile(ALREADY_STARTED_PATTERN)
+
+        if pattern.match(conflict_exception.message):
+            logging.warning("Instance '{}' " \
+                            "already started".format(instance_name))
+        else:
+            raise conflict_exception

@@ -16,6 +16,7 @@ CLI_BASE_PATH = os.path.abspath(os.path.join(IMPLEMENTATION_DIR, os.pardir))
 OPENSTACK_CONFIG_FILE = os.path.join(MY_PATH, "config.json")
 logging.config.fileConfig(os.path.join(CLI_BASE_PATH, 'logging.conf'))
 
+
 class OpenstackClient(object):
     """ Contains the novaclient client object and facilitates
         the various connection methods to Openstack
@@ -38,8 +39,3 @@ class OpenstackClient(object):
         auth = identity.Password(**config)
         sess = session.Session(auth=auth)
         self.connection = client.Client(2, session=sess)
-
-
-if __name__ == "__main__":
-    client = OpenstackClient()
-    client.connection.servers.list()

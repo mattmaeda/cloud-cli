@@ -9,7 +9,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from client import OpenstackClient
-from util import get_instance
+from instance_util import get_instance
 
 MY_PATH = os.path.abspath(os.path.dirname(__file__))
 OPENSTACK_DIR = os.path.abspath(os.path.join(MY_PATH, os.pardir))
@@ -45,13 +45,18 @@ def execute(args):
                       "'{}'".format(args.instance_name))
         sys.exit(1)
 
-    else:
-        try:
-            instance.stop()
-        except novaclient.exceptions.Conflict, conflict_exception:
-            pattern = re.compile(ALREADY_STOPPED_PATTERN)
-            if pattern.match(conflict_exception.message):
-                logging.warning("Instance '{}' " \
-                                "already stopped".format(args.instance_name))
-            else:
-                raise conflict_exception
+    stop(instance, args.instance_name)
+
+
+def stop(instance, instance_name):
+    """ Takes an instance, and if valid, stops it
+    """
+    try:
+        instance.stop()
+    except novaclient.exceptions.Conflict, conflict_exception:
+        pattern = re.compile(ALREADY_STOPPED_PATTERN)
+        if pattern.match(conflict_exception.message):
+            logging.warning("Instance '{}' " \
+                            "already stopped".format(instance_name))
+        else:
+            raise conflict_exception

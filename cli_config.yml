@@ -60,9 +60,7 @@ arguments:
   help: "Volume Arguments"
   options:
   - create
-  - delete
-  - update
   - list
-  - detail
+  - delete
   - attach
   - detach

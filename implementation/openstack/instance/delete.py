@@ -1,5 +1,5 @@
 """
-Connects to Openstack environment and stops an instance
+Connects to Openstack environment and deletes an instance
 """
 import logging.config
 import os
@@ -7,7 +7,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from client import OpenstackClient
-from util import get_all_instances
+from instance_util import get_all_instances
 
 MY_PATH = os.path.abspath(os.path.dirname(__file__))
 OPENSTACK_DIR = os.path.abspath(os.path.join(MY_PATH, os.pardir))
@@ -36,14 +36,21 @@ def execute(args):
                                 project_id=args.project_id)
 
     instances = get_all_instances(openstack, args.instance_name)
+    delete(instances, args.instance_name)
 
+
+def delete(instances, instance_name):
+    """ Given a list of instances, deletes the specified
+        instance if it is in the list
+    """
     if instances is None:
         logging.warning("Unable to find instance " \
-                      "'{}'".format(args.instance_name))
+                      "'{}'".format(instance_name))
     elif len(instances) > 1:
         logging.error("Found {} instances " \
                       "of instance '{}'".format(len(instances),
-                                                args.instance_name))
+                                                instance_name))
+        sys.exit(1)
     else:
         instance = instances[0]
         instance.delete()

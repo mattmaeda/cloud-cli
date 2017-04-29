@@ -1,5 +1,5 @@
 """
-Creates an image from a given server
+Finds a volume and attaches it to an instance
 """
 import logging.config
 import os
@@ -8,6 +8,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from client import OpenstackClient
 from instance_util import get_instance
+from volume_util import get_volume_details, attach_volume_to_instance
 
 MY_PATH = os.path.abspath(os.path.dirname(__file__))
 OPENSTACK_DIR = os.path.abspath(os.path.join(MY_PATH, os.pardir))
@@ -21,29 +22,42 @@ ARGS = [
     {'name': 'username', 'help': 'Openstack project username'},
     {'name': 'password', 'help': 'Openstack project password'},
     {'name': 'project_id', 'help': 'Openstack project ID'},
-    {
-        'name': 'instance_name',
-        'required': True,
-        'help': 'Name of instance from which to make an instance'
-    },
-    {'name': 'image_name', 'required': True, 'help': 'Name of image'}
+    {'name': 'instance_name', 'help': 'Name of the server'},
+    {'name': 'volume_name', 'help': 'Name of volume'},
+    {'name': 'volume_id', 'help': 'ID of the volume'}
 ]
 
 def execute(args):
-    """ Creates image """
+    """ Find volume and attach to an instance
+
+        Note that as of the 12.0.0 Liberty release,
+        the Nova libvirt driver no longer honors a
+        user-supplied device name. This is the same
+        behavior as if the device name parameter is
+        not supplied on the request.
+
+    """
     openstack = OpenstackClient(auth_url=args.auth_url,
                                 username=args.username,
                                 password=args.password,
                                 project_id=args.project_id)
 
-    instance = get_instance(openstack, args.instance_name)
+
+    instance = get_instance_by_name(openstack, args.instance_name)
+    volume = get_volume_details(openstack, volume_name=args.volume_name,
+                                volume_id=args.volume_id)
+
+    attach_volume_to_instance(openstack, instance, volume)
+
+
+def get_instance_by_name(client, instance_name):
+    """ Gets instance by instance name """
+    instance = get_instance(client, instance_name)
 
     if instance is None:
         logging.error("Unable to load instance " \
-                      "'{}'".format(args.instance_name))
+                      "'{}'".format(instance_name))
         sys.exit(1)
 
-    else:
-        instance.create_image(args.image_name)
-
+    return instance
 
