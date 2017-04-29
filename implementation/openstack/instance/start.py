@@ -17,6 +17,7 @@ IMPLEMENTATION_DIR = os.path.abspath(os.path.join(OPENSTACK_DIR, os.pardir))
 CLI_BASE_PATH = os.path.abspath(os.path.join(IMPLEMENTATION_DIR, os.pardir))
 
 ALREADY_STARTED_PATTERN = "Cannot 'start' instance .* while it is in vm_state active"
+
 logging.config.fileConfig(os.path.join(CLI_BASE_PATH, 'logging.conf'))
 
 ARGS = [

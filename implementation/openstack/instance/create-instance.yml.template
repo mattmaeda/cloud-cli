@@ -1,3 +1,7 @@
+#####
+# All of the below except for name, image, and flavor
+# can be set in the default-settings.yml file and
+# excluded from this config file
 ---
 name: server_name (required)
 image: image_name (required)
@@ -5,18 +9,34 @@ flavor: server_size (required)
 meta:
 files:
 reservation_id:
-min_count: 1
+min_count: 1 (defaults to 1)
 max_count:
+
 security_groups:
 - example_sec_group_1 (at least one required)
 - example_sec_group_2
+
 userdata:
 key_name: name-of-pem (required)
 availability_zone: example-az (required)
+
+#####
+# Block device names are automatically assigned
+# starting from /dev/vdb and incrementing by the
+# last letter, e.g., /dev/vdc, /dev/vdd, etc.
+
 block_device_mapping:
 block_device_mapping_v2:
+- source_type: blank (blank|snapshot|volume|image)
+  destination_type: volume (volume|local)
+  volume_size: 100 <integer value>
+
+#####
+# Name of network to deploy instance
+
 nics:
 - example_network (at least one required)
+
 scheduler_hints:
 config_drive:
 disk_config:

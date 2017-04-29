@@ -1,0 +1,37 @@
+meta:
+files:
+reservation_id:
+min_count: 1 (defaults to 1)
+max_count:
+
+security_groups:
+- example_sec_group_1 (if set, at least one required)
+- example_sec_group_2
+
+userdata:
+key_name: name-of-pem
+availability_zone: example-az
+
+#####
+# Block device names are automatically assigned
+# starting from /dev/vdb and incrementing by the
+# last letter, e.g., /dev/vdc, /dev/vdd, etc.
+
+block_device_mapping:
+block_device_mapping_v2:
+- source_type: (blank|snapshot|volume|image)
+  destination_type: (volume|local)
+  volume_size: <integer value>
+
+#####
+# Name of network to deploy instance
+
+nics:
+- example_network (if set, at least one required)
+
+scheduler_hints:
+config_drive:
+disk_config:
+admin_pass:
+access_ip_v4:
+access_ip_v6:
